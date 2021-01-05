@@ -1,0 +1,32 @@
+{
+  "name": "imgdot-sdk",
+  "version": "0.1.0",
+  "description": "imgdot SDK lib",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imgdot/imgdot-sdk-js.git"
+  },
+  "keywords": [
+    "imgdot"
+  ],
+  "author": "Fangzhou Xu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/imgdot/imgdot-sdk-js/issues"
+  },
+  "homepage": "https://github.com/imgdot/imgdot-sdk-js#readme",
+  "devDependencies": {
+    "@types/node": "^14.14.19",
+    "tslint": "^6.1.3",
+    "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.820.0"
+  }
+}
