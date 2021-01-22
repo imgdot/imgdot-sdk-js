@@ -2,6 +2,7 @@ import * as aws from "aws-sdk";
 import fetch from "node-fetch";
 import { Base64 } from "js-base64";
 import createHmac from "create-hmac";
+import { Mutex } from "async-mutex";
 
 const API_URL = "https://api.imgdot.dev";
 // const API_URL = "http://localhost:8080";
@@ -24,43 +25,50 @@ export class ImgDot {
   s3Client?: aws.S3;
   s3Bucket?: string;
   imgProxyConfig?: ImgProxyConfig;
+  initLock: Mutex;
 
   constructor(podId: string, credential: ApiKeyCredential) {
     this.podId = podId;
     this.credential = credential;
+    this.initLock = new Mutex();
   }
 
   async init(refresh = false) {
-    if (this.s3Client && !refresh) {
-      return;
+    const release = await this.initLock.acquire();
+    try {
+      if (this.s3Client && !refresh) {
+        return;
+      }
+      const resp = await fetch(`${API_URL}/pod-config/${this.podId}`, {
+        method: "GET",
+        headers: {
+          Authorization: "Basic " + Base64.encode(`${this.credential.apiId}:${this.credential.apiKey}`),
+        },
+      });
+      const jsonResp = await resp.json();
+      const s3Config = jsonResp.s3Config;
+
+      this.s3Client = new aws.S3({
+        accessKeyId: s3Config.accessKey,
+        secretAccessKey: s3Config.secretKey,
+        region: s3Config.region,
+        endpoint: s3Config.endpoint,
+        sslEnabled: s3Config.sslEnabled,
+      });
+      this.s3Bucket = s3Config.bucket;
+
+      const imgProxyResp = jsonResp.imgProxyConfig;
+      this.imgProxyConfig = {
+        baseUrl: imgProxyResp.baseUrl,
+        key: imgProxyResp.key,
+        salt: imgProxyResp.salt,
+        quality: imgProxyResp.quality,
+      };
+      console.log("init:", this);
+      return this;
+    } finally {
+      release();
     }
-    const resp = await fetch(`${API_URL}/pod-config/${this.podId}`, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + Base64.encode(`${this.credential.apiId}:${this.credential.apiKey}`),
-      },
-    });
-    const jsonResp = await resp.json();
-    const s3Config = jsonResp.s3Config;
-
-    this.s3Client = new aws.S3({
-      accessKeyId: s3Config.accessKey,
-      secretAccessKey: s3Config.secretKey,
-      region: s3Config.region,
-      endpoint: s3Config.endpoint,
-      sslEnabled: s3Config.sslEnabled,
-    });
-    this.s3Bucket = s3Config.bucket;
-
-    const imgProxyResp = jsonResp.imgProxyConfig;
-    this.imgProxyConfig = {
-      baseUrl: imgProxyResp.baseUrl,
-      key: imgProxyResp.key,
-      salt: imgProxyResp.salt,
-      quality: imgProxyResp.quality,
-    };
-    // console.log("init:", this);
-    return this;
   }
 
   async readFile(key: string) {
