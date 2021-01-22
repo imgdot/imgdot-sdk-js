@@ -4,7 +4,7 @@ import { Base64 } from "js-base64";
 import createHmac from "create-hmac";
 
 const API_URL = "https://api.imgdot.dev";
-const API_URL = "http://localhost:8080";
+// const API_URL = "http://localhost:8080";
 
 interface ApiKeyCredential {
   apiId: string;

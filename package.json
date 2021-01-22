@@ -1,5 +1,5 @@
 {
-  "name": "imgdot-sdk-js",
+  "name": "imgdot-sdk",
   "version": "0.1.0",
   "description": "imgdot SDK lib",
   "main": "lib/index.js",

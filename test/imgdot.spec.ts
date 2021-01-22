@@ -1,4 +1,3 @@
-import { assert } from "console";
 import { ImgDot } from "../src/imgdot";
 
 const imgDotClient = new ImgDot("e0b1c283-8a69-4d26-b2c6-ead55c351fe2", {
