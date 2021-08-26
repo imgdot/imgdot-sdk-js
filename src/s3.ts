@@ -34,6 +34,15 @@ export const s3WriteFile = (key: string, fileContent: string | Buffer | Uint8Arr
     .promise();
 };
 
+export const s3DeleteFile = (key: string) => {
+  return getS3Client()
+    .deleteObject({
+      Bucket: process.env.S3_BUCKET!,
+      Key: key,
+    })
+    .promise();
+};
+
 export const s3FileExist = (key: string) => {
   return new Promise((resolve, reject) => {
     getS3Client().headObject(
@@ -53,7 +62,7 @@ export const s3FileExist = (key: string) => {
         } else {
           resolve(true);
         }
-      }
+      },
     );
   });
 };
