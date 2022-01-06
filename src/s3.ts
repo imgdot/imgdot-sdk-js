@@ -1,9 +1,11 @@
 import * as aws from "aws-sdk";
+const https = require("https");
 
 const S3_ACCESS_KEY = process.env.S3_ACCESS_KEY;
 const S3_SECRET_KEY = process.env.S3_SECRET_KEY;
 const S3_REGION = process.env.S3_REGION;
 const S3_ENDPOINT = process.env.S3_ENDPOINT;
+const S3_SSL = process.env.S3_SSL === "true";
 
 const getS3Client = () => {
   return new aws.S3({
@@ -11,7 +13,12 @@ const getS3Client = () => {
     secretAccessKey: S3_SECRET_KEY,
     region: S3_REGION,
     endpoint: S3_ENDPOINT,
-    sslEnabled: false,
+    sslEnabled: S3_SSL,
+    s3ForcePathStyle: true,
+    signatureVersion: "v4",
+    httpOptions: {
+      agent: new https.Agent({ rejectUnauthorized: false }),
+    },
   });
 };
 

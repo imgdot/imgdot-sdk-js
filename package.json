@@ -1,6 +1,6 @@
 {
   "name": "imgdot-sdk",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "imgdot SDK lib",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
